@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+<script>
+const md = markdownit({
+  xhtmlOut:true,
+  breaks:true,
+  html:true
+}).disable(['smartquotes']);
+
+const proxy = (tokens, idx, options, env, self) => self.renderToken(tokens, idx, options);
+
+const defaultOrderedListOpenRenderer = md.renderer.rules.ordered_list_open || proxy;
+md.renderer.rules.ordered_list_open = function(tokens, idx, options, env, self) {
+  var id = tokens[idx].level / 2 + 1
+  tokens[idx].attrJoin("class", "editor-ol" + id);
+  return defaultOrderedListOpenRenderer(tokens, idx, options, env, self)
+};
+
+const defaultBulletListOpenRenderer = md.renderer.rules.bullet_list_open || proxy;
+md.renderer.rules.bullet_list_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-ul");
+  return defaultBulletListOpenRenderer(tokens, idx, options, env, self)
+};
+
+const defaultStrongOpenRenderer = md.renderer.rules.strong_open || proxy;
+md.renderer.rules.strong_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-text-bold");
+  tokens[idx].attrJoin("style", "white-space: pre-wrap;");
+  return defaultStrongOpenRenderer(tokens, idx, options, env, self)
+};
+
+const defaultParagraphOpenRenderer = md.renderer.rules.paragraph_open || proxy;
+md.renderer.rules.paragraph_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-paragraph");
+  return `${defaultParagraphOpenRenderer(tokens, idx, options, env, self)}<span style="white-space: pre-wrap;">`;
+};
+
+const defaultParagraphCloseRenderer = md.renderer.rules.paragraph_close || proxy;
+md.renderer.rules.paragraph_close = function(tokens, idx, options, env, self) {
+  return `</span>${defaultParagraphCloseRenderer(tokens, idx, options, env, self)}`;
+};
+
+const defaultHeadingOpenRenderer = md.renderer.rules.heading_open || proxy;
+md.renderer.rules.heading_open = function(tokens, idx, options, env, self) {
+  ntag = tokens[idx].tag.split('')
+  if (ntag[1] > 4) {
+  	return `<p class="editor-paragraph"><span style="white-space: pre-wrap;">${tokens[idx].markup} `
+  }
+  return defaultHeadingOpenRenderer(tokens, idx, options, env, self);
+};
+
+const defaultHeadingCloseRenderer = md.renderer.rules.heading_close || proxy;
+md.renderer.rules.heading_close = function(tokens, idx, options, env, self) {
+  ntag = tokens[idx].tag.split('')
+  if (ntag[1] > 4) {
+  	return `</span></p>\n`
+  }
+  return defaultHeadingCloseRenderer(tokens, idx, options, env, self);
+};
+
+const defaultListItemOpenRenderer = md.renderer.rules.list_item_open || proxy;
+md.renderer.rules.list_item_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-list-item");
+  return defaultListItemOpenRenderer(tokens, idx, options, env, self);
+};
+
+const defaultSoftbreakRenderer = md.renderer.rules.softbreak || proxy;
+md.renderer.rules.softbreak = function(tokens, idx, options, env, self) {
+  var pre = ``;
+  var suff = ``;
+  if (tokens[idx-1].type == 'text') {
+    pre = `</span>`
+  }
+  if (tokens[idx+1].type == 'text') {
+    suff = `<span style="white-space: pre-wrap;">`
+  }
+  return `${pre}${defaultSoftbreakRenderer(tokens, idx, options, env, self)}${suff}`;
+};
+
+function confirmInput() {
+  var markdown = document.forms[0].mdi.value;
+  var element = document.getElementById("nso");
+  var render = md.render(markdown);
+  element.innerHTML = render.replace(/<(\/*?)ins>/g, '<$1u>');
+}
+</script>
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+}
+.vertical {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  height: 100%;
+  justify-items: stretch;
+}
+.buttonbox {
+  border: solid #000;
+  align-items: center;
+}
+.horizontal {
+  display: flex;
+  margin: 0;
+  height: 100%;
+}
+.horizontal > div {
+  width:50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: solid #000;
+  align-items: center;
+}
+textarea{
+  height: 100%;
+  width: 98%;
+  margin: 3px;
+}
+input {
+  width: 100%;
+}
+</style>
+</head>
+<body>
+<div class="vertical">
+<div class="horizontal">
+  <form id="form1" onsubmit="confirmInput()" action="javascript:void(0);"></form>
+  <div>
+    <h2>Markdown Input</h2>
+    <textarea id="mdi" name="Markdown" form="form1"></textarea>
+  </div>
+  <div>
+  	<h2>NinjaOne "Source" Output </h2>
+    <textarea id="nso" name="NinjaSource" readonly></textarea>
+  </div>
+</div>
+<div class="buttonbox">
+<input id="ok" type="submit" value="Submit" form="form1">
+</div>
+</div>
+</body>
+</html>
