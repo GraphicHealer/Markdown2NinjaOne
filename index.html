@@ -2,7 +2,12 @@
 <html>
 <head>
 <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/default.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/languages/xml.min.js"></script>
 <script>
+hljs.highlightAll();
+
 const md = markdownit({
   xhtmlOut:true,
   breaks:true,
@@ -80,27 +85,54 @@ md.renderer.rules.softbreak = function(tokens, idx, options, env, self) {
 };
 
 function confirmInput() {
-  var markdown = document.forms[0].mdi.value;
+  var markdown = document.getElementById("mdi").value;
   var element = document.getElementById("nso");
   var render = md.render(markdown);
-  element.innerHTML = render.replace(/<(\/*?)ins>/g, '<$1u>');
+  element.textContent = render.replace(/<(\/*?)ins>/g, '<$1u>');
+}
+
+function notification(message, color="#0f0") {
+  let notify = document.getElementById("notify");
+  notify.style.background = color;
+  notify.textContent = message;
+  notify.hidden = false;
+  setTimeout(() => {
+    notify.hidden = true;
+    notify.textContent = '';
+  }, 3000);
+}
+
+function copyToClipboard(id){
+  const selection = window.getSelection();
+  let element = document.getElementById(id);
+  
+  
+  if (element.textContent.length == 0) {
+    notification('Nothing to Copy!');
+    return;
+  }
+  
+  if (selection.rangeCount > 0) {
+    selection.removeAllRanges();
+  }
+  
+  const range = document.createRange();
+  
+  range.selectNode(element);
+  selection.addRange(range);
+  
+  navigator.clipboard.writeText(element.textContent);
+  
+  notification("Copied to Clipboard!");
 }
 </script>
 <style>
 html, body {
-  height: 100%;
-  margin: 0;
-}
-.vertical {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  height: 100%;
-  justify-items: stretch;
-}
-.buttonbox {
-  border: solid #000;
-  align-items: center;
+  height: 99%;
+  margin: 0px;
+  font-feature-settings: "cv05";
+  font-family: Inter, sans-serif;
+  font-size: medium;
 }
 .horizontal {
   display: flex;
@@ -114,33 +146,81 @@ html, body {
   flex-direction: column;
   border: solid #000;
   align-items: center;
+  background: rgb(0, 42, 66);
+}
+h2 {
+  color: #fff;
+}
+.output {
+  background: #eee;
+  -moz-appearance: textfield-multiline;
+  -webkit-appearance: textarea;
+  border: 1px solid gray;
+  font: medium -moz-fixed;
+  font: -webkit-small-control;
+  height: 100%;
+  overflow: auto;
+  padding: 0;
+  margin: 3px;
+  width: 98%;
+  position: relative;
+}
+.copy {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+}
+.notify {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px;
+  margin: 0;
+  z-index: 100;
+  background: #0f0;
+}
+.data {
+  height: 100%;
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+
+}
+pre {
+  margin: 0;
+  padding: 0;
+}
+code {
+  overflow-x: visible !important;
+  background: none !important;
 }
 textarea{
   height: 100%;
-  width: 98%;
+  width: 93%;
   margin: 3px;
-}
-input {
-  width: 100%;
+  resize: none;
+  padding: 1em;
 }
 </style>
 </head>
 <body>
-<div class="vertical">
 <div class="horizontal">
-  <form id="form1" onsubmit="confirmInput()" action="javascript:void(0);"></form>
+  <b><p id="notify" class="notify" hidden></p></b>
   <div>
     <h2>Markdown Input</h2>
-    <textarea id="mdi" name="Markdown" form="form1"></textarea>
+    <textarea id="mdi" name="Markdown" oninput="confirmInput()"></textarea>
   </div>
   <div>
   	<h2>NinjaOne "Source" Output </h2>
-    <textarea id="nso" name="NinjaSource" readonly></textarea>
+    <div class="output" name="NinjaSource">
+      <button class="copy" onclick="copyToClipboard('nso')">Copy</button>
+      <div class="data">
+        <pre><code id="nso" class="language-xml"></code></pre>
+      </div>
+    </div>
   </div>
-</div>
-<div class="buttonbox">
-<input id="ok" type="submit" value="Submit" form="form1">
-</div>
 </div>
 </body>
 </html>
