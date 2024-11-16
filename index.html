@@ -122,6 +122,7 @@ function copyToClipboard(id){
 function github() {
   window.open("https://github.com/GraphicHealer/Markdown2NinjaOne", "_blank").focus();
 }
+confirmInput()
 </script>
 <style>
 html, body {
@@ -302,8 +303,7 @@ code {
 <div class="horizontal">
   <div class="left">
     <h2>Markdown Input</h2>
-    <div class="input" id="mdi" name="Markdown" contenteditable="plaintext-only" oninput="confirmInput()">
-# Simple Markdown Sample
+<div class="input" id="mdi" name="Markdown" contenteditable="plaintext-only" oninput="confirmInput()"># Simple Markdown Sample
 
 ## Heading Levels
 # Heading 1
@@ -340,8 +340,7 @@ code {
 > — Wikipedia
 
 ## Code
-Inline code: `print("Hello, World!")`
-    </div>
+Inline code: `print("Hello, World!")`</div>
   </div>
   <div class="right">
   	<h2>NinjaOne "Source" Output </h2>
