@@ -122,7 +122,9 @@ function copyToClipboard(id){
 function github() {
   window.open("https://github.com/GraphicHealer/Markdown2NinjaOne", "_blank").focus();
 }
-confirmInput()
+window.onload = function() {
+  confirmInput();
+};
 </script>
 <style>
 html, body {
