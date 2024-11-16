@@ -86,7 +86,7 @@ md.renderer.rules.softbreak = function(tokens, idx, options, env, self) {
 };
 
 function confirmInput() {
-  var markdown = document.getElementById("mdi").innerHTML;
+  var markdown = document.getElementById("mdi").textContent;
   var element = document.getElementById("nso");
   var render = md.render(markdown);
   element.textContent = render.replace(/<(\/*?)ins>/g, '<$1u>');
