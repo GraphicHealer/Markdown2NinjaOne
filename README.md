@@ -1,7 +1,16 @@
 # Markdown2NinjaOne
 Convert Markdown Content to NinjaOne's Source Format for Documentation.
 
+## How to Use
 View it Here: https://graphichealer.github.io/Markdown2NinjaOne/
+1. Paste or Write Markdown in the Left Textbox
+2. Click the Copy button on the upper-right of the Right Textbox.
+3. Open NinjaOne and go to the `Knowledge Base`.
+4. Click `Add > New Document`.
+5. On the new doc page, click `Source`, select all (`ctrl+a`), then Paste the copied HTML in.
+   ![image](https://github.com/user-attachments/assets/1be86f0a-f38f-4274-abdc-e0ebdfd24c19)
+6. Click `Source` again, then hit `Save`.
+
 
 Here are the resources I used to build this HTML page:
 - This editor was a GODSEND. It sped up my testing by ALOT: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_basic
