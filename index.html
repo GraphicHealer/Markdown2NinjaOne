@@ -158,6 +158,20 @@ html, body {
 .right {
   padding-left: 0.5em !important;
 }
+@media screen and (max-width: 900px) {
+  .horizontal {
+    flex-direction: column;
+  }
+  .horizontal > div {
+    width: auto;
+  }
+  .left {
+    padding-right: 1em !important;
+  }
+  .right {
+    padding-left: 1em !important;
+  }
+}
 h1 {
   color: #fff;
   background: #002a42;
@@ -224,8 +238,8 @@ h2 {
 }
 .github {
   position: absolute;
-  top: 1px;
-  right: 20%;
+  top: 2px;
+  right: 5px;
   z-index: 100;
   width: 58.9px;
   height: 60px;
