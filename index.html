@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/default.min.css">
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/languages/xml.min.js"></script>
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script>
 hljs.highlightAll();
 
@@ -90,22 +91,18 @@ function confirmInput() {
   var render = md.render(markdown);
   element.textContent = render.replace(/<(\/*?)ins>/g, '<$1u>');
 }
-
-function notification(message, color="#0f0") {
+function notification(message, color="#c8cace") {
   let notify = document.getElementById("notify");
   notify.style.background = color;
   notify.textContent = message;
-  notify.hidden = false;
+  notify.style.transform = "translateY(0)";
   setTimeout(() => {
-    notify.hidden = true;
-    notify.textContent = '';
+    notify.style.transform = "translateY(-3em)";
   }, 3000);
 }
-
 function copyToClipboard(id){
   const selection = window.getSelection();
   let element = document.getElementById(id);
-  
   
   if (element.textContent.length == 0) {
     notification('Nothing to Copy!');
@@ -117,19 +114,22 @@ function copyToClipboard(id){
   }
   
   const range = document.createRange();
-  
   range.selectNode(element);
   selection.addRange(range);
-  
   navigator.clipboard.writeText(element.textContent);
-  
   notification("Copied to Clipboard!");
+}
+function github() {
+  window.open("https://github.com/GraphicHealer/Markdown2NinjaOne", "_blank").focus();
 }
 </script>
 <style>
 html, body {
-  height: 99%;
-  margin: 0px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
   font-feature-settings: "cv05";
   font-family: Inter, sans-serif;
   font-size: medium;
@@ -137,32 +137,68 @@ html, body {
 .horizontal {
   display: flex;
   margin: 0;
-  height: 100%;
+  height: auto;
+  padding: 0;
+  flex-grow: 1;
 }
 .horizontal > div {
-  width:50%;
-  height: 100%;
+  width: 50%;
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
-  border: solid #000;
+  border: none;
   align-items: center;
-  background: rgb(0, 42, 66);
+  background: #fff;
+  padding: 1em;
+  margin: 0;
+}
+.left {
+  padding-right: 0.5em !important;
+}
+.right {
+  padding-left: 0.5em !important;
+}
+h1 {
+  color: #fff;
+  background: #002a42;
+  width: 100%;
+  height: 2em;
+  line-height: 2em;
+  text-align: center;
+  padding: 0em;
+  margin: 0;
 }
 h2 {
   color: #fff;
+  background: #002a42;
+  width: 100%;
+  height: 2em;
+  line-height: 2em;
+  text-align: center;
+  padding: 0em;
+  margin: 0;
+  border-radius: 15px;
 }
-.output {
-  background: #eee;
+.horizontal > div > div {
+  border-radius: 15px;
   -moz-appearance: textfield-multiline;
   -webkit-appearance: textarea;
-  border: 1px solid gray;
   font: medium -moz-fixed;
   font: -webkit-small-control;
-  height: 100%;
   overflow: auto;
-  padding: 0;
-  margin: 3px;
-  width: 93%;
+  padding: 1em;
+  margin: 0;
+  flex-grow: 1;
+  align-self: stretch;
+  margin-top: 1em;
+}
+.input{
+  background: #fff;
+  border: solid thin #c8cace;
+}
+.output {
+  background: #f4f5fa;
+  border: none;
   position: relative;
 }
 .copy {
@@ -170,15 +206,64 @@ h2 {
   top: 0;
   right: 0;
   z-index: 100;
+  width: 3em;
+  height: 3em;
+  text-align: center;
+  border-bottom-left-radius:10px;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: none;
+  -webkit-transition: background .2s ease-in-out;
+  -moz-transition: background .2s ease-in-out;
+  -o-transition: background .2s ease-in-out;
+  transition: background .2s ease-in-out;
+}
+.copy:hover {
+  background: #c8cace;
+}
+.github {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  z-index: 100;
+  width: 58.9px;
+  height: 60px;
+  font-size: 3em;
+  text-align: left;
+  border: none;
+  border-radius: 30px;
+  padding: 0;
+  margin: 0;
+  padding-left: 1.1px;
+  background: none;
+  vertical-align: bottom;
+  color: #fff;
+  -webkit-transition: color .2s ease, background .2s ease;
+  -moz-transition: color .2s ease, background .2s ease;
+  -o-transition: color .2s ease, background .2s ease;
+  transition: color .2s ease, background .2s ease;
+}
+.github:hover {
+  background: #fff;
+  color: #002a42;
 }
 .notify {
   position: absolute;
   top: 0;
   left: 0;
-  padding: 2px;
+  right: 0;
+  height: 3em;
+  line-height: 3em;
+  text-align: center;
+  padding: 0;
   margin: 0;
   z-index: 100;
-  background: #0f0;
+  transform: translateY(-3em);
+  -webkit-transition: transform .5s ease;
+  -moz-transition: transform .5s ease;
+  -o-transition: transform .5s ease;
+  transition: transform .5s ease;
 }
 .data {
   height: 100%;
@@ -195,26 +280,21 @@ code {
   overflow-x: visible !important;
   background: none !important;
 }
-textarea{
-  height: 100%;
-  width: 93%;
-  margin: 3px;
-  resize: none;
-  padding: 1em;
-}
 </style>
 </head>
 <body>
+<h1 class="github" onclick="github()"><svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" viewBox="0 0 256 256"><path d="M216,104v8a56.06,56.06,0,0,1-48.44,55.47A39.8,39.8,0,0,1,176,192v40a8,8,0,0,1-8,8H104a8,8,0,0,1-8-8V216H72a40,40,0,0,1-40-40A24,24,0,0,0,8,152a8,8,0,0,1,0-16,40,40,0,0,1,40,40,24,24,0,0,0,24,24H96v-8a39.8,39.8,0,0,1,8.44-24.53A56.06,56.06,0,0,1,56,112v-8a58.14,58.14,0,0,1,7.69-28.32A59.78,59.78,0,0,1,69.07,28,8,8,0,0,1,76,24a59.75,59.75,0,0,1,48,24h24a59.75,59.75,0,0,1,48-24,8,8,0,0,1,6.93,4,59.74,59.74,0,0,1,5.37,47.68A58,58,0,0,1,216,104Z"></path></svg></h1>
+<h1>Markdown to NinjaOne</h1>
 <div class="horizontal">
-  <b><p id="notify" class="notify" hidden></p></b>
-  <div>
+  <div class="left">
     <h2>Markdown Input</h2>
-    <textarea id="mdi" name="Markdown" oninput="confirmInput()"></textarea>
+    <div class="input" id="mdi" name="Markdown" contenteditable="plaintext-only" oninput="confirmInput()" ></div>
   </div>
-  <div>
+  <div class="right">
   	<h2>NinjaOne "Source" Output </h2>
     <div class="output" name="NinjaSource">
-      <button class="copy" onclick="copyToClipboard('nso')">Copy</button>
+      <b><p id="notify" class="notify"></p></b>
+      <button class="copy" onclick="copyToClipboard('nso')"><i class="ph-light ph-copy" style="font-size: 2em;"></i></button>
       <div class="data">
         <pre><code id="nso" class="language-xml"></code></pre>
       </div>
