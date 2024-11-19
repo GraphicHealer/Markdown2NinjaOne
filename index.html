@@ -92,7 +92,6 @@ md.renderer.rules.blockquote_open = function(tokens, idx, options, env, self) {
 // Fence (Code)
 const defaultFenceRenderer = md.renderer.rules.fence || proxy;
 md.renderer.rules.fence = function(tokens, idx, options, env, self) {
-  console.log(tokens[idx]);
   tokens[idx].attrJoin("class", "editor-code");
   tokens[idx].attrJoin("spellcheck", "false");
   tokens[idx].attrJoin("data-highlight-language", tokens[idx].info);
