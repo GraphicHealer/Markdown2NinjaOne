@@ -15,6 +15,34 @@ const md = markdownit({
 
 const proxy = (tokens, idx, options, env, self) => self.renderToken(tokens, idx, options);
 
+const defaultBlockquoteOpenRenderer = md.renderer.rules.table_open || proxy;
+md.renderer.rules.table_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-quote");
+  return defaultBlockquoteOpenRenderer(tokens, idx, options, env, self)
+};
+
+const defaultTableOpenRenderer = md.renderer.rules.table_open || proxy;
+md.renderer.rules.table_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-table");
+  test = tokens[idx].map[1] - tokens[idx].map[0]
+  col = `<col />\n`
+  return `${defaultTableOpenRenderer(tokens, idx, options, env, self)}<colgroup>\n${col.repeat(test)}</colgroup>\n`
+};
+
+const defaultTHOpenRenderer = md.renderer.rules.th_open || proxy;
+md.renderer.rules.th_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-table-cell editor-table-cell-header");
+  tokens[idx].attrJoin("style", "vertical-align: top; text-align: start; background-color: rgb(242, 243, 245);");
+  return defaultTHOpenRenderer(tokens, idx, options, env, self)
+};
+
+const defaultTDOpenRenderer = md.renderer.rules.td_open || proxy;
+md.renderer.rules.td_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-table-cell");
+  tokens[idx].attrJoin("style", "vertical-align: top; text-align: start;");
+  return defaultTDOpenRenderer(tokens, idx, options, env, self)
+};
+
 const defaultOrderedListOpenRenderer = md.renderer.rules.ordered_list_open || proxy;
 md.renderer.rules.ordered_list_open = function(tokens, idx, options, env, self) {
   var id = tokens[idx].level / 2 + 1
@@ -52,7 +80,7 @@ md.renderer.rules.heading_open = function(tokens, idx, options, env, self) {
   if (ntag[1] > 4) {
   	return `<p class="editor-paragraph"><span style="white-space: pre-wrap;">${tokens[idx].markup} `
   }
-  return defaultHeadingOpenRenderer(tokens, idx, options, env, self);
+  return `${defaultHeadingOpenRenderer(tokens, idx, options, env, self)}<span style="white-space: pre-wrap;">`;
 };
 
 const defaultHeadingCloseRenderer = md.renderer.rules.heading_close || proxy;
@@ -61,7 +89,7 @@ md.renderer.rules.heading_close = function(tokens, idx, options, env, self) {
   if (ntag[1] > 4) {
   	return `</span></p>\n`
   }
-  return defaultHeadingCloseRenderer(tokens, idx, options, env, self);
+  return `</span>${defaultHeadingCloseRenderer(tokens, idx, options, env, self)}`;
 };
 
 const defaultListItemOpenRenderer = md.renderer.rules.list_item_open || proxy;
@@ -355,7 +383,14 @@ code {
 > — Wikipedia
 
 ## Code
-Inline code: `print("Hello, World!")`</div>
+Inline code: `print("Hello, World!")`
+
+## Table
+| Month    | Savings |
+| -------- | ------- |
+| January  | $250    |
+| February | $80     |
+| March    | $420    |</div>
   </div>
   <div class="right">
   	<h2>NinjaOne "Source" Output </h2>
