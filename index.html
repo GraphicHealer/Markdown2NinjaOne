@@ -136,6 +136,7 @@ html, body {
   font-feature-settings: "cv05";
   font-family: Inter, sans-serif;
   font-size: medium;
+  overflow: hidden;
 }
 .horizontal {
   display: flex;
@@ -161,7 +162,7 @@ html, body {
 .right {
   padding-left: 0.5em !important;
 }
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1260px) {
   .horizontal {
     flex-direction: column;
   }
@@ -212,6 +213,9 @@ h2 {
 .input{
   background: #fff;
   border: solid thin #c8cace;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  white-space: nowrap;
 }
 .output {
   background: #f4f5fa;
