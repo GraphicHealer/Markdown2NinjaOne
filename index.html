@@ -5,7 +5,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/vs.min.css">
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/highlight.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/languages/xml.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/underscore@1.13.7/underscore-umd-min.min.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script>
 const md = markdownit({
@@ -88,9 +87,7 @@ function confirmInput() {
   var markdown = document.getElementById("mdi").textContent;
   var element = document.getElementById("nso");
   var render = md.render(markdown).replace(/<(\/*?)ins>/g, '<$1u>');
-  esc = _.escape(render);
-  code = hljs.highlight(render, {language: 'xml'}).value;
-  element.innerHTML = code;
+  element.innerHTML = hljs.highlight(render, {language: 'xml'}).value;
 }
 function notification(message, color="#c8cace") {
   let notify = document.getElementById("notify");
