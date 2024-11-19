@@ -5,6 +5,10 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/vs.min.css">
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/highlight.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/languages/xml.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-ins@4.0.0/dist/markdown-it-ins.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-sub@2.0.0/dist/markdown-it-sub.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-sup@2.0.0/dist/markdown-it-sup.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-mark@4.0.0/dist/markdown-it-mark.min.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script>
 // Initalize Markdown-It
@@ -17,33 +21,54 @@ const md = markdownit({
 // Setup Object-Proxy
 const proxy = (tokens, idx, options, env, self) => self.renderToken(tokens, idx, options);
 
-// Strong/Bold Text
+// Strong Open
 const defaultStrongOpenRenderer = md.renderer.rules.strong_open || proxy;
 md.renderer.rules.strong_open = function(tokens, idx, options, env, self) {
-  tokens[idx].attrJoin("class", "editor-text-bold");
-  tokens[idx].attrJoin("style", "white-space: pre-wrap;");
+  tokens[idx].tag = "b";
   return defaultStrongOpenRenderer(tokens, idx, options, env, self);
 };
 
-// Emphasis (Italics)
+// Strong Close
+const defaultStrongCloseRenderer = md.renderer.rules.strong_close || proxy;
+md.renderer.rules.strong_close = function(tokens, idx, options, env, self) {
+  tokens[idx].tag = "b";
+  return defaultStrongCloseRenderer(tokens, idx, options, env, self);
+};
+
+// Emphasis (Italics) Open
 const defaultEmOpenRenderer = md.renderer.rules.em_open || proxy;
 md.renderer.rules.em_open = function(tokens, idx, options, env, self) {
-  tokens[idx].attrJoin("class", "editor-text-italic");
-  tokens[idx].attrJoin("style", "white-space: pre-wrap;");
-  return defaultEmOpenRenderer(tokens, idx, options, env, self)
+  tokens[idx].tag = "i";
+  return defaultEmOpenRenderer(tokens, idx, options, env, self);
+};
+
+// Emphasis (Italics) Close
+const defaultEmCloseRenderer = md.renderer.rules.em_close || proxy;
+md.renderer.rules.em_close = function(tokens, idx, options, env, self) {
+  tokens[idx].tag = "i";
+  return defaultEmCloseRenderer(tokens, idx, options, env, self);
+};
+
+// Text
+const defaultTextRenderer = md.renderer.rules.text || proxy;
+md.renderer.rules.text = function(tokens, idx, options, env, self) {
+  typeEnd = `span`;
+  typeStart = `${typeEnd}`;
+  
+  search = tokens[idx-3,idx+3]
+  
+  if (tokens[idx].content != "") {
+    return `<${typeStart} style="white-space: pre-wrap;">${defaultTextRenderer(tokens, idx, options, env, self)}</${typeEnd}>`;
+  } else {
+    return "";
+  };
 };
 
 // Paragraph Open
 const defaultParagraphOpenRenderer = md.renderer.rules.paragraph_open || proxy;
 md.renderer.rules.paragraph_open = function(tokens, idx, options, env, self) {
   tokens[idx].attrJoin("class", "editor-paragraph");
-  return `${defaultParagraphOpenRenderer(tokens, idx, options, env, self)}<span style="white-space: pre-wrap;">`;
-};
-
-// Paragraph Close
-const defaultParagraphCloseRenderer = md.renderer.rules.paragraph_close || proxy;
-md.renderer.rules.paragraph_close = function(tokens, idx, options, env, self) {
-  return `</span>${defaultParagraphCloseRenderer(tokens, idx, options, env, self)}`;
+  return defaultParagraphOpenRenderer(tokens, idx, options, env, self);
 };
 
 // Line Break ('<br />')
@@ -92,7 +117,6 @@ md.renderer.rules.blockquote_open = function(tokens, idx, options, env, self) {
 // Fence (Code)
 const defaultFenceRenderer = md.renderer.rules.fence || proxy;
 md.renderer.rules.fence = function(tokens, idx, options, env, self) {
-  console.log(tokens[idx]);
   tokens[idx].attrJoin("class", "editor-code");
   tokens[idx].attrJoin("spellcheck", "false");
   tokens[idx].attrJoin("data-highlight-language", tokens[idx].info);
