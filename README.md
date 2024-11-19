@@ -38,8 +38,7 @@ Here are the resources I used to build this HTML page:
 - [ ] Subtext
 - [ ] Supertext
 
-
-- [X] Code Blocks - **These are currently broken in NinjaOne's Editor!**
+**Code Blocks are currently broken in NinjaOne's Editor!**
 
 As you can see, this is still a work in progress. The list above is pretty much everything markdown related that NinjaOne's editor supports.
 
