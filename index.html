@@ -7,116 +7,142 @@
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/languages/xml.min.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script>
+// Initalize Markdown-It
 const md = markdownit({
   xhtmlOut:true,
   breaks:true,
   html:true
 }).disable(['smartquotes']);
 
+// Setup Object-Proxy
 const proxy = (tokens, idx, options, env, self) => self.renderToken(tokens, idx, options);
 
-const defaultBlockquoteOpenRenderer = md.renderer.rules.table_open || proxy;
-md.renderer.rules.table_open = function(tokens, idx, options, env, self) {
-  tokens[idx].attrJoin("class", "editor-quote");
-  return defaultBlockquoteOpenRenderer(tokens, idx, options, env, self)
-};
-
-const defaultTableOpenRenderer = md.renderer.rules.table_open || proxy;
-md.renderer.rules.table_open = function(tokens, idx, options, env, self) {
-  tokens[idx].attrJoin("class", "editor-table");
-  test = tokens[idx].map[1] - tokens[idx].map[0]
-  col = `<col />\n`
-  return `${defaultTableOpenRenderer(tokens, idx, options, env, self)}<colgroup>\n${col.repeat(test)}</colgroup>\n`
-};
-
-const defaultTHOpenRenderer = md.renderer.rules.th_open || proxy;
-md.renderer.rules.th_open = function(tokens, idx, options, env, self) {
-  tokens[idx].attrJoin("class", "editor-table-cell editor-table-cell-header");
-  tokens[idx].attrJoin("style", "vertical-align: top; text-align: start; background-color: rgb(242, 243, 245);");
-  return defaultTHOpenRenderer(tokens, idx, options, env, self)
-};
-
-const defaultTDOpenRenderer = md.renderer.rules.td_open || proxy;
-md.renderer.rules.td_open = function(tokens, idx, options, env, self) {
-  tokens[idx].attrJoin("class", "editor-table-cell");
-  tokens[idx].attrJoin("style", "vertical-align: top; text-align: start;");
-  return defaultTDOpenRenderer(tokens, idx, options, env, self)
-};
-
-const defaultOrderedListOpenRenderer = md.renderer.rules.ordered_list_open || proxy;
-md.renderer.rules.ordered_list_open = function(tokens, idx, options, env, self) {
-  var id = tokens[idx].level / 2 + 1
-  tokens[idx].attrJoin("class", "editor-ol" + id);
-  return defaultOrderedListOpenRenderer(tokens, idx, options, env, self)
-};
-
-const defaultBulletListOpenRenderer = md.renderer.rules.bullet_list_open || proxy;
-md.renderer.rules.bullet_list_open = function(tokens, idx, options, env, self) {
-  tokens[idx].attrJoin("class", "editor-ul");
-  return defaultBulletListOpenRenderer(tokens, idx, options, env, self)
-};
-
+// Strong/Bold Text
 const defaultStrongOpenRenderer = md.renderer.rules.strong_open || proxy;
 md.renderer.rules.strong_open = function(tokens, idx, options, env, self) {
   tokens[idx].attrJoin("class", "editor-text-bold");
   tokens[idx].attrJoin("style", "white-space: pre-wrap;");
-  return defaultStrongOpenRenderer(tokens, idx, options, env, self)
+  return defaultStrongOpenRenderer(tokens, idx, options, env, self);
 };
 
+// Emphasis (Italics)
+const defaultEmOpenRenderer = md.renderer.rules.em_open || proxy;
+md.renderer.rules.em_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-text-italic");
+  tokens[idx].attrJoin("style", "white-space: pre-wrap;");
+  return defaultEmOpenRenderer(tokens, idx, options, env, self)
+};
+
+// Paragraph Open
 const defaultParagraphOpenRenderer = md.renderer.rules.paragraph_open || proxy;
 md.renderer.rules.paragraph_open = function(tokens, idx, options, env, self) {
   tokens[idx].attrJoin("class", "editor-paragraph");
   return `${defaultParagraphOpenRenderer(tokens, idx, options, env, self)}<span style="white-space: pre-wrap;">`;
 };
 
+// Paragraph Close
 const defaultParagraphCloseRenderer = md.renderer.rules.paragraph_close || proxy;
 md.renderer.rules.paragraph_close = function(tokens, idx, options, env, self) {
   return `</span>${defaultParagraphCloseRenderer(tokens, idx, options, env, self)}`;
 };
 
+// Line Break ('<br />')
+const defaultSoftbreakRenderer = md.renderer.rules.softbreak || proxy;
+md.renderer.rules.softbreak = function(tokens, idx, options, env, self) {
+  var pre = ``;
+  var suff = ``;
+  if (tokens[idx-1].type == 'text') {
+    pre = `</span>`;
+  };
+  if (tokens[idx+1].type == 'text') {
+    suff = `<span style="white-space: pre-wrap;">`;
+  };
+  return `${pre}${defaultSoftbreakRenderer(tokens, idx, options, env, self)}${suff}`;
+};
+
+// Quoteblocks
+const defaultBlockquoteOpenRenderer = md.renderer.rules.blockquote_open || proxy;
+md.renderer.rules.blockquote_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-quote");
+  return defaultBlockquoteOpenRenderer(tokens, idx, options, env, self)
+};
+
+// Heading Open
 const defaultHeadingOpenRenderer = md.renderer.rules.heading_open || proxy;
 md.renderer.rules.heading_open = function(tokens, idx, options, env, self) {
-  ntag = tokens[idx].tag.split('')
+  ntag = tokens[idx].tag.split('');
   if (ntag[1] > 4) {
-  	return `<p class="editor-paragraph"><span style="white-space: pre-wrap;">${tokens[idx].markup} `
-  }
+  	return `<p class="editor-paragraph"><span style="white-space: pre-wrap;">${tokens[idx].markup} `;
+  };
   return `${defaultHeadingOpenRenderer(tokens, idx, options, env, self)}<span style="white-space: pre-wrap;">`;
 };
 
+// Heading Close
 const defaultHeadingCloseRenderer = md.renderer.rules.heading_close || proxy;
 md.renderer.rules.heading_close = function(tokens, idx, options, env, self) {
-  ntag = tokens[idx].tag.split('')
+  ntag = tokens[idx].tag.split('');
   if (ntag[1] > 4) {
-  	return `</span></p>\n`
-  }
+  	return `</span></p>\n`;
+  };
   return `</span>${defaultHeadingCloseRenderer(tokens, idx, options, env, self)}`;
 };
 
+// Ordered Lists
+const defaultOrderedListOpenRenderer = md.renderer.rules.ordered_list_open || proxy;
+md.renderer.rules.ordered_list_open = function(tokens, idx, options, env, self) {
+  var id = tokens[idx].level / 2 + 1;
+  tokens[idx].attrJoin("class", "editor-ol" + id);
+  return defaultOrderedListOpenRenderer(tokens, idx, options, env, self);
+};
+
+// Unordered Lists
+const defaultBulletListOpenRenderer = md.renderer.rules.bullet_list_open || proxy;
+md.renderer.rules.bullet_list_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-ul");
+  return defaultBulletListOpenRenderer(tokens, idx, options, env, self);
+};
+
+// List Item
 const defaultListItemOpenRenderer = md.renderer.rules.list_item_open || proxy;
 md.renderer.rules.list_item_open = function(tokens, idx, options, env, self) {
   tokens[idx].attrJoin("class", "editor-list-item");
   return defaultListItemOpenRenderer(tokens, idx, options, env, self);
 };
 
-const defaultSoftbreakRenderer = md.renderer.rules.softbreak || proxy;
-md.renderer.rules.softbreak = function(tokens, idx, options, env, self) {
-  var pre = ``;
-  var suff = ``;
-  if (tokens[idx-1].type == 'text') {
-    pre = `</span>`
-  }
-  if (tokens[idx+1].type == 'text') {
-    suff = `<span style="white-space: pre-wrap;">`
-  }
-  return `${pre}${defaultSoftbreakRenderer(tokens, idx, options, env, self)}${suff}`;
+// Table
+const defaultTableOpenRenderer = md.renderer.rules.table_open || proxy;
+md.renderer.rules.table_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-table");
+  test = tokens[idx].map[1] - tokens[idx].map[0];
+  col = `<col />\n`;
+  return `${defaultTableOpenRenderer(tokens, idx, options, env, self)}<colgroup>\n${col.repeat(test)}</colgroup>\n`
 };
 
+// Table Header
+const defaultTHOpenRenderer = md.renderer.rules.th_open || proxy;
+md.renderer.rules.th_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-table-cell editor-table-cell-header");
+  tokens[idx].attrJoin("style", "vertical-align: top; text-align: start; background-color: rgb(242, 243, 245);");
+  return defaultTHOpenRenderer(tokens, idx, options, env, self);
+};
+
+// Table Data (Row)
+const defaultTDOpenRenderer = md.renderer.rules.td_open || proxy;
+md.renderer.rules.td_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-table-cell");
+  tokens[idx].attrJoin("style", "vertical-align: top; text-align: start;");
+  return defaultTDOpenRenderer(tokens, idx, options, env, self);
+};
+
+// Process Markdown
 function confirmInput() {
   var markdown = document.getElementById("mdi").textContent;
   var element = document.getElementById("nso");
   var render = md.render(markdown).replace(/<(\/*?)ins>/g, '<$1u>');
   element.innerHTML = hljs.highlight(render, {language: 'xml'}).value;
 }
+
+// Notifications
 function notification(message, color="#c8cace") {
   let notify = document.getElementById("notify");
   notify.style.background = color;
@@ -126,6 +152,8 @@ function notification(message, color="#c8cace") {
     notify.style.transform = "translateY(-3em)";
   }, 3000);
 }
+
+// Copy Button
 function copyToClipboard(id){
   const selection = window.getSelection();
   let element = document.getElementById(id);
@@ -133,14 +161,18 @@ function copyToClipboard(id){
   if (element.textContent.length == 0) {
     notification('Nothing to Copy!');
     return;
-  }
+  };
   
   navigator.clipboard.writeText(element.textContent);
   notification("Copied to Clipboard!");
 }
+
+// Open on Github
 function github() {
   window.open("https://github.com/GraphicHealer/Markdown2NinjaOne", "_blank").focus();
-}
+};
+
+// Run Example on Load
 window.onload = function() {
   confirmInput();
 };
@@ -384,6 +416,12 @@ code {
 
 ## Code
 Inline code: `print("Hello, World!")`
+Block Code:
+```
+window.onload = function() {
+  confirmInput();
+};
+```
 
 ## Table
 | Month    | Savings |
