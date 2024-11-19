@@ -28,7 +28,8 @@ Here are the resources I used to build this HTML page:
 - [X] Horizontal Rules
 - [X] Inline HTML
 - [X] Underline (Converts `<ins>` to `<u>`)
-- [ ] Quoteblocks
+- [X] Quoteblocks
+- [X] Tables
 - [ ] Italics
 - [ ] URL Links
 - [ ] Images
@@ -36,7 +37,6 @@ Here are the resources I used to build this HTML page:
 - [ ] Strikethrough
 - [ ] Subtext
 - [ ] Supertext
-- [ ] Tables
 - [ ] Code Blocks (These are currently broken in NinjaOne's Editor)
 
 As you can see, this is still a work in progress. The list above is pretty much everything markdown related that NinjaOne's editor supports.
