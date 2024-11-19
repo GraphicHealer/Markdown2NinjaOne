@@ -60,13 +60,6 @@ md.renderer.rules.softbreak = function(tokens, idx, options, env, self) {
   return `${pre}${defaultSoftbreakRenderer(tokens, idx, options, env, self)}${suff}`;
 };
 
-// Quoteblocks
-const defaultBlockquoteOpenRenderer = md.renderer.rules.blockquote_open || proxy;
-md.renderer.rules.blockquote_open = function(tokens, idx, options, env, self) {
-  tokens[idx].attrJoin("class", "editor-quote");
-  return defaultBlockquoteOpenRenderer(tokens, idx, options, env, self)
-};
-
 // Heading Open
 const defaultHeadingOpenRenderer = md.renderer.rules.heading_open || proxy;
 md.renderer.rules.heading_open = function(tokens, idx, options, env, self) {
@@ -85,6 +78,25 @@ md.renderer.rules.heading_close = function(tokens, idx, options, env, self) {
   	return `</span></p>\n`;
   };
   return `</span>${defaultHeadingCloseRenderer(tokens, idx, options, env, self)}`;
+};
+
+// Quoteblocks
+const defaultBlockquoteOpenRenderer = md.renderer.rules.blockquote_open || proxy;
+md.renderer.rules.blockquote_open = function(tokens, idx, options, env, self) {
+  tokens[idx].attrJoin("class", "editor-quote");
+  return defaultBlockquoteOpenRenderer(tokens, idx, options, env, self);
+};
+
+// <pre class="editor-code" spellcheck="false" data-highlight-language="javascript"><span style="white-space: pre-wrap;">
+
+// Fence (Code)
+const defaultFenceRenderer = md.renderer.rules.fence || proxy;
+md.renderer.rules.fence = function(tokens, idx, options, env, self) {
+  console.log(tokens[idx]);
+  tokens[idx].attrJoin("class", "editor-code");
+  tokens[idx].attrJoin("spellcheck", "false");
+  tokens[idx].attrJoin("data-highlight-language", tokens[idx].info);
+  return defaultFenceRenderer(tokens, idx, options, env, self);
 };
 
 // Ordered Lists
@@ -417,7 +429,7 @@ code {
 ## Code
 Inline code: `print("Hello, World!")`
 Block Code:
-```
+```php
 window.onload = function() {
   confirmInput();
 };
