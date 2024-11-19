@@ -2,13 +2,12 @@
 <html>
 <head>
 <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/default.min.css">
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/vs.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/highlight.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/languages/xml.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/underscore@1.13.7/underscore-umd-min.min.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script>
-hljs.highlightAll();
-
 const md = markdownit({
   xhtmlOut:true,
   breaks:true,
@@ -88,8 +87,10 @@ md.renderer.rules.softbreak = function(tokens, idx, options, env, self) {
 function confirmInput() {
   var markdown = document.getElementById("mdi").textContent;
   var element = document.getElementById("nso");
-  var render = md.render(markdown);
-  element.textContent = render.replace(/<(\/*?)ins>/g, '<$1u>');
+  var render = md.render(markdown).replace(/<(\/*?)ins>/g, '<$1u>');
+  esc = _.escape(render);
+  code = hljs.highlight(render, {language: 'xml'}).value;
+  element.innerHTML = code;
 }
 function notification(message, color="#c8cace") {
   let notify = document.getElementById("notify");
@@ -109,13 +110,6 @@ function copyToClipboard(id){
     return;
   }
   
-  if (selection.rangeCount > 0) {
-    selection.removeAllRanges();
-  }
-  
-  const range = document.createRange();
-  range.selectNode(element);
-  selection.addRange(range);
   navigator.clipboard.writeText(element.textContent);
   notification("Copied to Clipboard!");
 }
@@ -136,7 +130,6 @@ html, body {
   font-feature-settings: "cv05";
   font-family: Inter, sans-serif;
   font-size: medium;
-  overflow: hidden;
 }
 .horizontal {
   display: flex;
@@ -224,6 +217,7 @@ h2 {
 }
 .copy {
   position: absolute;
+  cursor: pointer;
   top: 0;
   right: 0;
   z-index: 100;
@@ -245,29 +239,47 @@ h2 {
 }
 .github {
   position: absolute;
-  top: 2px;
-  right: 5px;
+  cursor: pointer;
+  top: 10px;
+  right: 10px;
   z-index: 100;
-  width: 58.9px;
-  height: 60px;
-  font-size: 3em;
-  text-align: left;
-  border: none;
-  border-radius: 30px;
+  display: flex;
+  text-align: center;
+  align-items: center;
   padding: 0;
   margin: 0;
-  padding-left: 1.1px;
+  border: none;
+  border-radius: 5px;
+  padding-right: 1px;
   background: none;
-  vertical-align: bottom;
   color: #fff;
-  -webkit-transition: color .2s ease, background .2s ease;
-  -moz-transition: color .2s ease, background .2s ease;
-  -o-transition: color .2s ease, background .2s ease;
-  transition: color .2s ease, background .2s ease;
+}
+.github > p {
+  padding: 0;
+  margin: 4px;
+  font-size: .9em;
+  font-weight: bold;
+  font-style: italic;
+}
+.gh-icon {
+  width: 37px;
+  height: 34px;
+  border: none;
+  border-radius: 20px;
+  padding-right: 2px;
+  background: #fff;
+  color: #002a42;
+  padding: p;
+  padding-top: 5px;
+  margin: 2px;
 }
 .github:hover {
   background: #fff;
   color: #002a42;
+}
+.github:hover > .gh-icon {
+  background: #002a42;
+  color: #fff;
 }
 .notify {
   position: absolute;
@@ -304,7 +316,7 @@ code {
 </style>
 </head>
 <body>
-<h1 class="github" onclick="github()"><svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" viewBox="0 0 256 256"><path d="M216,104v8a56.06,56.06,0,0,1-48.44,55.47A39.8,39.8,0,0,1,176,192v40a8,8,0,0,1-8,8H104a8,8,0,0,1-8-8V216H72a40,40,0,0,1-40-40A24,24,0,0,0,8,152a8,8,0,0,1,0-16,40,40,0,0,1,40,40,24,24,0,0,0,24,24H96v-8a39.8,39.8,0,0,1,8.44-24.53A56.06,56.06,0,0,1,56,112v-8a58.14,58.14,0,0,1,7.69-28.32A59.78,59.78,0,0,1,69.07,28,8,8,0,0,1,76,24a59.75,59.75,0,0,1,48,24h24a59.75,59.75,0,0,1,48-24,8,8,0,0,1,6.93,4,59.74,59.74,0,0,1,5.37,47.68A58,58,0,0,1,216,104Z"></path></svg></h1>
+<div class="github" onclick="github()"><p>View On<br />GitHub</p><div class="gh-icon"><svg xmlns="http://www.w3.org/2000/svg" width="37" height="37" fill="currentColor" viewBox="0 0 256 256"><path d="M216,104v8a56.06,56.06,0,0,1-48.44,55.47A39.8,39.8,0,0,1,176,192v40a8,8,0,0,1-8,8H104a8,8,0,0,1-8-8V216H72a40,40,0,0,1-40-40A24,24,0,0,0,8,152a8,8,0,0,1,0-16,40,40,0,0,1,40,40,24,24,0,0,0,24,24H96v-8a39.8,39.8,0,0,1,8.44-24.53A56.06,56.06,0,0,1,56,112v-8a58.14,58.14,0,0,1,7.69-28.32A59.78,59.78,0,0,1,69.07,28,8,8,0,0,1,76,24a59.75,59.75,0,0,1,48,24h24a59.75,59.75,0,0,1,48-24,8,8,0,0,1,6.93,4,59.74,59.74,0,0,1,5.37,47.68A58,58,0,0,1,216,104Z"></path></svg></div></div>
 <h1>Markdown to NinjaOne</h1>
 <div class="horizontal">
   <div class="left">
@@ -354,7 +366,7 @@ Inline code: `print("Hello, World!")`</div>
       <b><p id="notify" class="notify"></p></b>
       <button class="copy" onclick="copyToClipboard('nso')"><i class="ph-light ph-copy" style="font-size: 2em;"></i></button>
       <div class="data">
-        <pre><code id="nso" class="language-xml"></code></pre>
+        <pre><code id="nso" class="language-html"></code></pre>
       </div>
     </div>
   </div>
