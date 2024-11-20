@@ -11,6 +11,10 @@
 <script src="https://cdn.jsdelivr.net/npm/markdown-it-mark@4.0.0/dist/markdown-it-mark.min.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script>
+console.log('------------------START------------------');
+// Debug Mode
+const debug = true;
+
 // Initalize Markdown-It
 const md = markdownit({
   xhtmlOut:true,
@@ -52,16 +56,27 @@ md.renderer.rules.em_close = function(tokens, idx, options, env, self) {
 // Text
 const defaultTextRenderer = md.renderer.rules.text || proxy;
 md.renderer.rules.text = function(tokens, idx, options, env, self) {
+  if (tokens[idx].content == "") {
+    return "";
+  };
+  
   typeEnd = `span`;
   typeStart = `${typeEnd}`;
   
-  search = tokens[idx-3,idx+3]
+  searchStart = tokens.slice(0, idx);
+  searchLength = Math.min(idx, (tokens.length-1)-idx);
   
-  if (tokens[idx].content != "") {
-    return `<${typeStart} style="white-space: pre-wrap;">${defaultTextRenderer(tokens, idx, options, env, self)}</${typeEnd}>`;
-  } else {
-    return "";
+  search = function(list, query) {
+    let re = new RegExp(`^${variable}_open$|^${variable}_close$`, "g");
+    list.filter(e => re.test(e.type));
+    return count;
+  }
+  
+  if (searchLength != 0) {
+    console.log(`${tokens[idx].content}, ${search(searchStart, "strong")}`);
   };
+
+  return `<${typeStart} style="white-space: pre-wrap;">${defaultTextRenderer(tokens, idx, options, env, self)}</${typeEnd}>`;
 };
 
 // Paragraph Open
@@ -410,16 +425,20 @@ code {
 
 ## Text Formatting
 **Bold text**  
-*Italicized text*  
+_Italicized text_
 ~~Strikethrough~~  
 **_Bold and Italicized text_**
 ++Underline++
+~Subscript~
+^Superscript^
+**_~~++All ^of^ ~the~ Formats++~~_**
 
 ## Lists
 ### Unordered List
 - Item 1
   - Sub-item 1.1
   - Sub-item 1.2
+  - **hello**
 - Item 2
 
 ### Ordered List
