@@ -22,19 +22,16 @@ const md = markdownit({
 const proxy = (tokens, idx, options, env, self) => self.renderToken(tokens, idx, options);
 
 // Inline Code
-const defaultCodeInlineRenderer = md.renderer.rules.code_inline || proxy;
 md.renderer.rules.code_inline = function(tokens, idx, options, env, self) {
   return `<code spellcheck="false" style="font-size: 14px; white-space: pre-wrap;"><span class="editor-text-code">${tokens[idx].content}</span></code>`;
 };
 
 // Mark Open
-const defaultMarkOpenRenderer = md.renderer.rules.mark_open || proxy;
 md.renderer.rules.mark_open = function(tokens, idx, options, env, self) {
   return '';
 };
 
 // Mark Close
-const defaultMarkCloseRenderer = md.renderer.rules.mark_close || proxy;
 md.renderer.rules.mark_close = function(tokens, idx, options, env, self) {
   return '';
 };
@@ -240,6 +237,24 @@ md.renderer.rules.table_open = function(tokens, idx, options, env, self) {
   test = tokens[idx].map[1] - tokens[idx].map[0];
   col = `<col />\n`;
   return `${defaultTableOpenRenderer(tokens, idx, options, env, self)}<colgroup>\n${col.repeat(test)}</colgroup>\n`;
+};
+
+// THead Open
+const defaultTHeadOpenRenderer = md.renderer.rules.thead_open || proxy;
+md.renderer.rules.thead_open = function(tokens, idx, options, env, self) {
+  tokens[idx].type = "tbody_open"
+  tokens[idx].tag = "tbody"
+  return defaultTHeadOpenRenderer(tokens, idx, options, env, self);
+};
+
+// THead Close
+md.renderer.rules.thead_close = function(tokens, idx, options, env, self) {
+  return '';
+};
+
+// TBody Open
+md.renderer.rules.tbody_open = function(tokens, idx, options, env, self) {
+  return '';
 };
 
 // Table Header
