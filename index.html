@@ -5,6 +5,10 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/vs.min.css">
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/highlight.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/languages/xml.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-ins@4.0.0/dist/markdown-it-ins.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-sub@2.0.0/dist/markdown-it-sub.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-sup@2.0.0/dist/markdown-it-sup.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-mark@4.0.0/dist/markdown-it-mark.min.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script>
 // Initalize Markdown-It
@@ -12,52 +16,158 @@ const md = markdownit({
   xhtmlOut:true,
   breaks:true,
   html:true
-}).disable(['smartquotes']);
+}).disable(['smartquotes']).use(markdownitIns).use(markdownitSub).use(markdownitSup).use(markdownitMark);
 
 // Setup Object-Proxy
 const proxy = (tokens, idx, options, env, self) => self.renderToken(tokens, idx, options);
 
-// Strong/Bold Text
+// Inline Code
+const defaultCodeInlineRenderer = md.renderer.rules.code_inline || proxy;
+md.renderer.rules.code_inline = function(tokens, idx, options, env, self) {
+  return `<code spellcheck="false" style="font-size: 14px; white-space: pre-wrap;"><span class="editor-text-code">${tokens[idx].content}</span></code>`;
+};
+
+// Mark Open
+const defaultMarkOpenRenderer = md.renderer.rules.mark_open || proxy;
+md.renderer.rules.mark_open = function(tokens, idx, options, env, self) {
+  return '';
+};
+
+// Mark Close
+const defaultMarkCloseRenderer = md.renderer.rules.mark_close || proxy;
+md.renderer.rules.mark_close = function(tokens, idx, options, env, self) {
+  return '';
+};
+
+// Strong Open
 const defaultStrongOpenRenderer = md.renderer.rules.strong_open || proxy;
 md.renderer.rules.strong_open = function(tokens, idx, options, env, self) {
-  tokens[idx].attrJoin("class", "editor-text-bold");
-  tokens[idx].attrJoin("style", "white-space: pre-wrap;");
+  tokens[idx].tag = "b";
   return defaultStrongOpenRenderer(tokens, idx, options, env, self);
 };
 
-// Emphasis (Italics)
+// Strong Close
+const defaultStrongCloseRenderer = md.renderer.rules.strong_close || proxy;
+md.renderer.rules.strong_close = function(tokens, idx, options, env, self) {
+  tokens[idx].tag = "b";
+  return defaultStrongCloseRenderer(tokens, idx, options, env, self);
+};
+
+// Emphasis (Italics) Open
 const defaultEmOpenRenderer = md.renderer.rules.em_open || proxy;
 md.renderer.rules.em_open = function(tokens, idx, options, env, self) {
-  tokens[idx].attrJoin("class", "editor-text-italic");
-  tokens[idx].attrJoin("style", "white-space: pre-wrap;");
-  return defaultEmOpenRenderer(tokens, idx, options, env, self)
+  tokens[idx].tag = "i";
+  return defaultEmOpenRenderer(tokens, idx, options, env, self);
+};
+
+// Emphasis (Italics) Close
+const defaultEmCloseRenderer = md.renderer.rules.em_close || proxy;
+md.renderer.rules.em_close = function(tokens, idx, options, env, self) {
+  tokens[idx].tag = "i";
+  return defaultEmCloseRenderer(tokens, idx, options, env, self);
+};
+
+// Underscore Open
+const defaultInsOpenRenderer = md.renderer.rules.ins_open || proxy;
+md.renderer.rules.ins_open = function(tokens, idx, options, env, self) {
+  tokens[idx].tag = "u";
+  return defaultInsOpenRenderer(tokens, idx, options, env, self);
+};
+
+// Underscore Close
+const defaultInsCloseRenderer = md.renderer.rules.ins_close || proxy;
+md.renderer.rules.ins_close = function(tokens, idx, options, env, self) {
+  tokens[idx].tag = "u";
+  return defaultInsCloseRenderer(tokens, idx, options, env, self);
+};
+
+// Text
+const defaultTextRenderer = md.renderer.rules.text || proxy;
+md.renderer.rules.text = function(tokens, idx, options, env, self) {
+  if (tokens[idx].content == "") {
+    return "";
+  };
+  
+  type = `span`;
+  typeClass = ``;
+  style = ` style="white-space: pre-wrap;"`;
+  classList = [];
+  
+  searchList = tokens.slice(0, idx);
+  searchLength = Math.min(idx, (tokens.length-1)-idx);
+  let queries = {mark: false, sub: false, sup: false, ins: false, s: false, em: false, strong: false};
+  
+  if (searchLength != 0) {
+    for (const name in queries) {
+      queries[name] = search(searchList, name);
+    };
+    if (queries["mark"]) {
+      style = ` style="background-color: rgb(248, 231, 28); white-space: pre-wrap;"`;
+    };
+    if (queries["sub"]) {
+      classList.push("editor-text-subscript");
+      style = ``;
+    };
+    if (queries["sup"]) {
+      classList.push("editor-text-superscript");
+      style = ``;
+    };
+    if (queries["ins"]) {
+      if (!queries["s"]) {
+        classList.push("editor-text-underline");
+      };
+    };
+    if (queries["s"]) {
+      if (queries["ins"]) {
+        classList.push("editor-text-underline-strikethrough");
+      } else {
+        classList.push("editor-text-strikethrough");
+      };
+    };
+    if (queries["em"]) {
+      classList.push("editor-text-italic");
+      type = `em`;
+    };
+    if (queries["strong"]) {
+      classList.push("editor-text-bold");
+      type = `strong`;
+    };
+  };
+  
+  if (classList.length > 0) {
+    typeClass = ` class="${classList.join(' ')}"`;
+  };
+  
+  return `<${type}${typeClass}${style}>${defaultTextRenderer(tokens, idx, options, env, self)}</${type}>`;
+};
+
+// Supertext Open
+const defaultSupOpenRenderer = md.renderer.rules.sup_open || proxy;
+md.renderer.rules.sup_open = function(tokens, idx, options, env, self) {
+  if (search(tokens.slice(0, idx), "mark")) {
+    tokens[idx].attrJoin("style", "background-color: rgb(248, 231, 28); white-space: pre-wrap;");
+  } else {
+    tokens[idx].attrJoin("style", "white-space: pre-wrap;");
+  };
+  return defaultSupOpenRenderer(tokens, idx, options, env, self);
+};
+
+// Subtext Open
+const defaultSubOpenRenderer = md.renderer.rules.sub_open || proxy;
+md.renderer.rules.sub_open = function(tokens, idx, options, env, self) {
+  if (search(tokens.slice(0, idx), "mark")) {
+    tokens[idx].attrJoin("style", "background-color: rgb(248, 231, 28); white-space: pre-wrap;");
+  } else {
+    tokens[idx].attrJoin("style", "white-space: pre-wrap;");
+  };
+  return defaultSubOpenRenderer(tokens, idx, options, env, self);
 };
 
 // Paragraph Open
 const defaultParagraphOpenRenderer = md.renderer.rules.paragraph_open || proxy;
 md.renderer.rules.paragraph_open = function(tokens, idx, options, env, self) {
   tokens[idx].attrJoin("class", "editor-paragraph");
-  return `${defaultParagraphOpenRenderer(tokens, idx, options, env, self)}<span style="white-space: pre-wrap;">`;
-};
-
-// Paragraph Close
-const defaultParagraphCloseRenderer = md.renderer.rules.paragraph_close || proxy;
-md.renderer.rules.paragraph_close = function(tokens, idx, options, env, self) {
-  return `</span>${defaultParagraphCloseRenderer(tokens, idx, options, env, self)}`;
-};
-
-// Line Break ('<br />')
-const defaultSoftbreakRenderer = md.renderer.rules.softbreak || proxy;
-md.renderer.rules.softbreak = function(tokens, idx, options, env, self) {
-  var pre = ``;
-  var suff = ``;
-  if (tokens[idx-1].type == 'text') {
-    pre = `</span>`;
-  };
-  if (tokens[idx+1].type == 'text') {
-    suff = `<span style="white-space: pre-wrap;">`;
-  };
-  return `${pre}${defaultSoftbreakRenderer(tokens, idx, options, env, self)}${suff}`;
+  return defaultParagraphOpenRenderer(tokens, idx, options, env, self);
 };
 
 // Heading Open
@@ -65,9 +175,14 @@ const defaultHeadingOpenRenderer = md.renderer.rules.heading_open || proxy;
 md.renderer.rules.heading_open = function(tokens, idx, options, env, self) {
   ntag = tokens[idx].tag.split('');
   if (ntag[1] > 4) {
-  	return `<p class="editor-paragraph"><span style="white-space: pre-wrap;">${tokens[idx].markup} `;
+    content = `${tokens[idx].markup} ${tokens[idx+1].content}`;
+    tokens[idx+1].content = content;
+    if (tokens[idx+1].children != null) {
+      tokens[idx+1].children[0].content = content;
+    };
+  	return `<p class="editor-paragraph">`;
   };
-  return `${defaultHeadingOpenRenderer(tokens, idx, options, env, self)}<span style="white-space: pre-wrap;">`;
+  return defaultHeadingOpenRenderer(tokens, idx, options, env, self);
 };
 
 // Heading Close
@@ -75,9 +190,9 @@ const defaultHeadingCloseRenderer = md.renderer.rules.heading_close || proxy;
 md.renderer.rules.heading_close = function(tokens, idx, options, env, self) {
   ntag = tokens[idx].tag.split('');
   if (ntag[1] > 4) {
-  	return `</span></p>\n`;
+  	return `</p>\n`;
   };
-  return `</span>${defaultHeadingCloseRenderer(tokens, idx, options, env, self)}`;
+  return defaultHeadingCloseRenderer(tokens, idx, options, env, self);
 };
 
 // Quoteblocks
@@ -86,8 +201,6 @@ md.renderer.rules.blockquote_open = function(tokens, idx, options, env, self) {
   tokens[idx].attrJoin("class", "editor-quote");
   return defaultBlockquoteOpenRenderer(tokens, idx, options, env, self);
 };
-
-// <pre class="editor-code" spellcheck="false" data-highlight-language="javascript"><span style="white-space: pre-wrap;">
 
 // Fence (Code)
 const defaultFenceRenderer = md.renderer.rules.fence || proxy;
@@ -126,7 +239,7 @@ md.renderer.rules.table_open = function(tokens, idx, options, env, self) {
   tokens[idx].attrJoin("class", "editor-table");
   test = tokens[idx].map[1] - tokens[idx].map[0];
   col = `<col />\n`;
-  return `${defaultTableOpenRenderer(tokens, idx, options, env, self)}<colgroup>\n${col.repeat(test)}</colgroup>\n`
+  return `${defaultTableOpenRenderer(tokens, idx, options, env, self)}<colgroup>\n${col.repeat(test)}</colgroup>\n`;
 };
 
 // Table Header
@@ -145,13 +258,22 @@ md.renderer.rules.td_open = function(tokens, idx, options, env, self) {
   return defaultTDOpenRenderer(tokens, idx, options, env, self);
 };
 
+// Search Function
+search = function(list, query) {
+  let re_op = new RegExp(`^${query}_open$`, "g");
+  let re_cl = new RegExp(`^${query}_close$`, "g");
+  let close = list.filter(e => re_cl.test(e.type)).length;
+  let open = list.filter(e => re_op.test(e.type)).length;
+  return ((open - close) == 1);
+};
+
 // Process Markdown
 function confirmInput() {
   var markdown = document.getElementById("mdi").textContent;
   var element = document.getElementById("nso");
   var render = md.render(markdown).replace(/<(\/*?)ins>/g, '<$1u>');
   element.innerHTML = hljs.highlight(render, {language: 'xml'}).value;
-}
+};
 
 // Notifications
 function notification(message, color="#c8cace") {
@@ -162,7 +284,7 @@ function notification(message, color="#c8cace") {
   setTimeout(() => {
     notify.style.transform = "translateY(-3em)";
   }, 3000);
-}
+};
 
 // Copy Button
 function copyToClipboard(id){
@@ -176,7 +298,7 @@ function copyToClipboard(id){
   
   navigator.clipboard.writeText(element.textContent);
   notification("Copied to Clipboard!");
-}
+};
 
 // Open on Github
 function github() {
@@ -396,18 +518,38 @@ code {
 ## Heading 2
 ### Heading 3
 #### Heading 4
+##### Heading 5 (This one will fail, NinjaOne Doesn't support more than h4)
 
 ## Text Formatting
-**Bold text**  
-*Italicized text*  
-~~Strikethrough~~  
+==marked==
+**Bold text**
+_Italicized text_
+~~Strikethrough~~
 **_Bold and Italicized text_**
+++Underline++
+~Subscript~
+^Superscript^
+
+**_~~++All ^of^ ~the~ ==Marked== Formats++~~_**
+
+_~~++All ^of^ ~the~ Formats++~~_
+
+~~++All ^of^ ~the~ Formats++~~
+
+++All ^of^ ~the~ Formats++
+
+~~All ^of^ ~the~ Formats~~
+
+All ^of^ ~the~ Formats
+
+==Marked==
 
 ## Lists
 ### Unordered List
 - Item 1
   - Sub-item 1.1
   - Sub-item 1.2
+  - **hello**
 - Item 2
 
 ### Ordered List
@@ -422,7 +564,7 @@ code {
 ![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg)
 
 ## Blockquotes
-> "Markdown is a lightweight markup language with plain text formatting syntax."  
+> "Markdown is a lightweight markup language with plain text formatting syntax."
 > — Wikipedia
 
 ## Code
