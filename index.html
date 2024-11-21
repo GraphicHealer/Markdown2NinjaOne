@@ -21,6 +21,16 @@ const md = markdownit({
 // Setup Object-Proxy
 const proxy = (tokens, idx, options, env, self) => self.renderToken(tokens, idx, options);
 
+// Images
+md.renderer.rules.image = function(tokens, idx, options, env, self) {
+  content = ``;
+  src = tokens[idx].attrGet('src');
+  if (tokens[idx].content != "") {
+  	content = `'${tokens[idx].content}' From:`;
+  };
+  return `<span style="background-color: rgb(0, 0, 0); color: rgb(248, 231, 28); white-space: pre-wrap;">Please Upload Image:${content}'${src}'</span>`;
+};
+
 // Inline Code
 md.renderer.rules.code_inline = function(tokens, idx, options, env, self) {
   return `<code spellcheck="false" style="font-size: 14px; white-space: pre-wrap;"><span class="editor-text-code">${tokens[idx].content}</span></code>`;
@@ -573,10 +583,11 @@ All ^of^ ~the~ Formats
 3. Step 3
 
 ## Links
-[Visit NinjaOne](https://NinjaOne.com)
+[Visit NinjaOne](https://www.NinjaOne.com)
 
 ## Images
 ![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg)
+![](https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg)
 
 ## Blockquotes
 > "Markdown is a lightweight markup language with plain text formatting syntax."
