@@ -28,7 +28,7 @@ md.renderer.rules.image = function(tokens, idx, options, env, self) {
   if (tokens[idx].content != "") {
   	content = `'${tokens[idx].content}' From:`;
   };
-  return `<span style="background-color: rgb(0, 0, 0); color: rgb(248, 231, 28); white-space: pre-wrap;">Please Upload Image:${content}'${src}'</span>`;
+  return `<span style="background-color: rgb(0, 0, 0); color: rgb(248, 231, 28); white-space: pre-wrap;">Replace With Image:${content}'${src}'</span>`;
 };
 
 // Inline Code
