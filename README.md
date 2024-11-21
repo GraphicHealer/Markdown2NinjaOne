@@ -30,13 +30,13 @@ Here are the resources I used to build this HTML page:
 - [X] Underline (Converts `<ins>` to `<u>`)
 - [X] Quoteblocks
 - [X] Tables
-- [ ] Italics
-- [ ] URL Links
-- [ ] Images
-- [ ] Inline Code
-- [ ] Strikethrough
-- [ ] Subtext
-- [ ] Supertext
+- [X] Italics
+- [X] URL Links
+- [X] Images - REQUIRES UPLOADING, GIVES WARNING
+- [X] Inline Code
+- [X] Strikethrough
+- [X] Subtext
+- [X] Supertext
 
 **Code Blocks are currently broken in NinjaOne's Editor!**
 
