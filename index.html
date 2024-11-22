@@ -421,6 +421,10 @@ html, body {
   padding: 1em;
   margin: 0;
   position: relative;
+  -webkit-transition: background .2s ease-in-out, color .2s ease-in-out;
+  -moz-transition: background .2s ease-in-out, color .2s ease-in-out;
+  -o-transition: background .2s ease-in-out, color .2s ease-in-out;
+  transition: background .2s ease-in-out, color .2s ease-in-out;
 }
 .left {
   padding-right: 0.5em !important;
@@ -480,10 +484,18 @@ h2 {
 .input{
   background: light-dark(#fff, #222);
   border: solid thin #c8cace;
+  -webkit-transition: background .2s ease-in-out, color .2s ease-in-out;
+  -moz-transition: background .2s ease-in-out, color .2s ease-in-out;
+  -o-transition: background .2s ease-in-out, color .2s ease-in-out;
+  transition: background .2s ease-in-out, color .2s ease-in-out;
 }
 .output {
   background: light-dark(#f4f5fa, #1a1a1a);
   border: none;
+  -webkit-transition: background .2s ease-in-out;
+  -moz-transition: background .2s ease-in-out;
+  -o-transition: background .2s ease-in-out;
+  transition: background .2s ease-in-out;
 }
 .copy {
   position: absolute;
@@ -499,10 +511,10 @@ h2 {
   padding: 0;
   margin: 0;
   background: none;
-  -webkit-transition: background .2s ease-in-out;
-  -moz-transition: background .2s ease-in-out;
-  -o-transition: background .2s ease-in-out;
-  transition: background .2s ease-in-out;
+  -webkit-transition: background .2s ease-in-out, color .2s ease-in-out;
+  -moz-transition: background .2s ease-in-out, color .2s ease-in-out;
+  -o-transition: background .2s ease-in-out, color .2s ease-in-out;
+  transition: background .2s ease-in-out, color .2s ease-in-out;
 }
 .copy:hover {
   background: light-dark(#c8cace, #000);
@@ -566,10 +578,10 @@ h2 {
   z-index: 100;
   background: light-dark(#c8cace, #000);
   transform: translateY(-3em);
-  -webkit-transition: transform .5s ease;
-  -moz-transition: transform .5s ease;
-  -o-transition: transform .5s ease;
-  transition: transform .5s ease;
+  -webkit-transition: transform .5s ease, background .2s ease-in-out, color .2s ease-in-out;
+  -moz-transition: transform .5s ease, background .2s ease-in-out, color .2s ease-in-out;
+  -o-transition: transform .5s ease, background .2s ease-in-out, color .2s ease-in-out;
+  transition: transform .5s ease, background .2s ease-in-out, color .2s ease-in-out;
 }
 .darkToggle {
   position: absolute;
