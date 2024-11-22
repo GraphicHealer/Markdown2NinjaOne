@@ -2,7 +2,7 @@
 <html>
 <head>
 <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/vs.min.css">
+<link id="style" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/vs.min.css">
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/highlight.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/languages/xml.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/markdown-it-ins@4.0.0/dist/markdown-it-ins.min.js"></script>
@@ -301,9 +301,11 @@ function confirmInput() {
 };
 
 // Notifications
-function notification(message, color="#c8cace") {
+function notification(message, color="") {
   let notify = document.getElementById("notify");
-  notify.style.background = color;
+  if (color != "") {
+    notify.style.background = color;
+  }
   notify.textContent = message;
   notify.style.transform = "translateY(0)";
   setTimeout(() => {
@@ -330,14 +332,40 @@ function github() {
   window.open("https://github.com/GraphicHealer/Markdown2NinjaOne", "_blank").focus();
 };
 
+// Dark Mode
+function darkToggle(mode=document.documentElement.style.colorScheme) {
+  elem = document.documentElement;
+  style = document.getElementById("style");
+  switch (mode) {
+    case "light":
+      elem.style.setProperty("color-scheme", "dark");
+      style.href = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/vs2015.min.css";
+      document.getElementById("sun").hidden = true;
+      document.getElementById("moon").hidden = false;
+      break;
+    case "dark":
+      elem.style.setProperty("color-scheme", "light");
+      style.href = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/vs.min.css";
+      document.getElementById("moon").hidden = true;
+      document.getElementById("sun").hidden = false;
+      break;
+  };
+};
+
 // Run Example on Load
 window.onload = function() {
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    darkToggle("light");
+  } else {
+    darkToggle("dark");
+  }
   confirmInput();
 };
 </script>
 <style>
 html, body {
   height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
   display: flex;
@@ -345,13 +373,17 @@ html, body {
   font-feature-settings: "cv05";
   font-family: Inter, sans-serif;
   font-size: medium;
+  position: relative;
 }
 .horizontal {
   display: flex;
   margin: 0;
+  width: 100%;
   height: auto;
+  overflow: auto;
   padding: 0;
   flex-grow: 1;
+  position: relative;
 }
 .horizontal > div {
   width: 50%;
@@ -360,9 +392,10 @@ html, body {
   flex-direction: column;
   border: none;
   align-items: center;
-  background: #fff;
+  background: light-dark(#fff, #000);
   padding: 1em;
   margin: 0;
+  position: relative;
 }
 .left {
   padding-right: 0.5em !important;
@@ -412,23 +445,19 @@ h2 {
   font: medium -moz-fixed;
   font: -webkit-small-control;
   overflow: auto;
-  padding: 1em;
   margin: 0;
   flex-grow: 1;
   align-self: stretch;
   margin-top: 1em;
+  position: relative;
 }
 .input{
-  background: #fff;
+  background: light-dark(#fff, #222);
   border: solid thin #c8cace;
-  word-break: keep-all;
-  overflow-wrap: normal;
-  white-space: nowrap;
 }
 .output {
-  background: #f4f5fa;
+  background: light-dark(#f4f5fa, #1a1a1a);
   border: none;
-  position: relative;
 }
 .copy {
   position: absolute;
@@ -450,7 +479,7 @@ h2 {
   transition: background .2s ease-in-out;
 }
 .copy:hover {
-  background: #c8cace;
+  background: light-dark(#c8cace, #000);
 }
 .github {
   position: absolute;
@@ -464,7 +493,9 @@ h2 {
   padding: 0;
   margin: 0;
   border: none;
-  border-radius: 5px;
+  border-radius: 2em;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
   padding-right: 1px;
   background: none;
   color: #fff;
@@ -507,11 +538,52 @@ h2 {
   padding: 0;
   margin: 0;
   z-index: 100;
+  background: light-dark(#c8cace, #000);
   transform: translateY(-3em);
   -webkit-transition: transform .5s ease;
   -moz-transition: transform .5s ease;
   -o-transition: transform .5s ease;
   transition: transform .5s ease;
+}
+.darkToggle {
+  position: absolute;
+  cursor: pointer;
+  top: 5px;
+  left: 10px;
+  z-index: 100;
+  display: flex;
+  width: 49px;
+  height: 48px;
+  text-align: center;
+  font-size: 3em;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  padding-top: 2px;
+  padding-left: 1px;
+  border: none;
+  border-radius: 3em;
+  padding-right: 1px;
+  background: none;
+  color: #fff;
+}
+.darkToggle:hover {
+  background: #fff;
+  color: #002a42;
+}
+[contenteditable] {
+  outline: 0px solid transparent;
+  margin: 0;
+  padding: 1em;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  white-space: nowrap;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
 }
 .data {
   height: 100%;
@@ -531,12 +603,13 @@ code {
 </style>
 </head>
 <body>
+<div class="darkToggle" onclick="darkToggle()"><i id="moon" class="ph-fill ph-moon" hidden></i><i id="sun" class="ph-fill ph-sun"></i></div>
 <div class="github" onclick="github()"><p>View On<br />GitHub</p><div class="gh-icon"><svg xmlns="http://www.w3.org/2000/svg" width="37" height="37" fill="currentColor" viewBox="0 0 256 256"><path d="M216,104v8a56.06,56.06,0,0,1-48.44,55.47A39.8,39.8,0,0,1,176,192v40a8,8,0,0,1-8,8H104a8,8,0,0,1-8-8V216H72a40,40,0,0,1-40-40A24,24,0,0,0,8,152a8,8,0,0,1,0-16,40,40,0,0,1,40,40,24,24,0,0,0,24,24H96v-8a39.8,39.8,0,0,1,8.44-24.53A56.06,56.06,0,0,1,56,112v-8a58.14,58.14,0,0,1,7.69-28.32A59.78,59.78,0,0,1,69.07,28,8,8,0,0,1,76,24a59.75,59.75,0,0,1,48,24h24a59.75,59.75,0,0,1,48-24,8,8,0,0,1,6.93,4,59.74,59.74,0,0,1,5.37,47.68A58,58,0,0,1,216,104Z"></path></svg></div></div>
 <h1>Markdown to NinjaOne</h1>
 <div class="horizontal">
   <div class="left">
     <h2>Markdown Input</h2>
-<div class="input" id="mdi" name="Markdown" contenteditable="plaintext-only" oninput="confirmInput()"># Simple Markdown Sample
+<div class="input"><div id="mdi" name="Markdown" contenteditable="plaintext-only" oninput="confirmInput()"># Simple Markdown Sample
 
 ## Heading Levels
 # Heading 1
@@ -583,7 +656,7 @@ All ^of^ ~the~ Formats
 3. Step 3
 
 ## Links
-[Visit NinjaOne](https://www.NinjaOne.com)
+[Visit NinjaOne](https://www.NinjaOne.com) gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg
 
 ## Images
 ![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg)
@@ -608,6 +681,7 @@ window.onload = function() {
 | January  | $250    |
 | February | $80     |
 | March    | $420    |</div>
+  </div>
   </div>
   <div class="right">
   	<h2>NinjaOne "Source" Output </h2>
