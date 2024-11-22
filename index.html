@@ -102,40 +102,43 @@ md.renderer.rules.text = function(tokens, idx, options, env, self) {
   
   searchList = tokens.slice(0, idx);
   searchLength = Math.min(idx, (tokens.length-1)-idx);
-  let queries = {mark: false, sub: false, sup: false, ins: false, s: false, em: false, strong: false};
   
   if (searchLength != 0) {
-    for (const name in queries) {
-      queries[name] = search(searchList, name);
-    };
-    if (queries["mark"]) {
+    mark = search(searchList, "mark");
+    sub = search(searchList, "sub");
+    sup = search(searchList, "sup");
+    s = search(searchList, "s");
+    ins = search(searchList, "ins");
+    em = search(searchList, "em");
+    strong = search(searchList, "strong");
+    if (mark) {
       style = ` style="background-color: rgb(248, 231, 28); white-space: pre-wrap;"`;
     };
-    if (queries["sub"]) {
+    if (sub) {
       classList.push("editor-text-subscript");
       style = ``;
     };
-    if (queries["sup"]) {
+    if (sup) {
       classList.push("editor-text-superscript");
       style = ``;
     };
-    if (queries["ins"]) {
-      if (!queries["s"]) {
+    if (ins) {
+      if (!s) {
         classList.push("editor-text-underline");
       };
     };
-    if (queries["s"]) {
-      if (queries["ins"]) {
+    if (s) {
+      if (ins) {
         classList.push("editor-text-underline-strikethrough");
       } else {
         classList.push("editor-text-strikethrough");
       };
     };
-    if (queries["em"]) {
+    if (em) {
       classList.push("editor-text-italic");
       type = `em`;
     };
-    if (queries["strong"]) {
+    if (strong) {
       classList.push("editor-text-bold");
       type = `strong`;
     };
@@ -292,13 +295,30 @@ search = function(list, query) {
   return ((open - close) == 1);
 };
 
+// Debounce a Function
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 // Process Markdown
+let lastInput = '';
 function confirmInput() {
-  var markdown = document.getElementById("mdi").textContent;
-  var element = document.getElementById("nso");
-  var render = md.render(markdown).replace(/<(\/*?)ins>/g, '<$1u>');
+  const markdown = document.getElementById("mdi").textContent;
+  if (markdown === lastInput) return;
+  
+  lastInput = markdown;
+  const element = document.getElementById("nso");
+  const render = md.render(markdown).replace(/<(\/*?)ins>/g, '<$1u>');
   element.innerHTML = hljs.highlight(render, {language: 'xml'}).value;
-};
+}
 
 // Notifications
 function notification(message, color="") {
@@ -352,8 +372,12 @@ function darkToggle(mode=document.documentElement.style.colorScheme) {
   };
 };
 
-// Run Example on Load
 window.onload = function() {
+  const debouncedConfirm = debounce(confirmInput, 150);
+  const mdi = document.getElementById("mdi");
+  mdi.addEventListener('input', debouncedConfirm);
+  
+  // Initial render
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     darkToggle("light");
   } else {
@@ -613,7 +637,7 @@ code {
 <div class="horizontal">
   <div class="left">
     <h2>Markdown Input</h2>
-<div class="input"><div id="mdi" name="Markdown" contenteditable="plaintext-only" oninput="confirmInput()"># Simple Markdown Sample
+<div class="input"><div id="mdi" name="Markdown" contenteditable="plaintext-only"># Simple Markdown Sample
 
 ## Heading Levels
 # Heading 1
