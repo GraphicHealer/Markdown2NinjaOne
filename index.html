@@ -388,6 +388,7 @@ html, body {
 .horizontal > div {
   width: 50%;
   display: flex;
+  box-sizing: border-box;
   flex-grow: 1;
   flex-direction: column;
   border: none;
@@ -446,6 +447,7 @@ h2 {
   font: -webkit-small-control;
   overflow: auto;
   margin: 0;
+  padding: 0;
   flex-grow: 1;
   align-self: stretch;
   margin-top: 1em;
@@ -574,7 +576,6 @@ h2 {
 [contenteditable] {
   outline: 0px solid transparent;
   margin: 0;
-  padding: 1em;
   word-break: keep-all;
   overflow-wrap: normal;
   white-space: nowrap;
@@ -582,8 +583,9 @@ h2 {
   scrollbar-gutter: stable;
   width: 100%;
   height: 100%;
-  padding: 0;
+  padding: 1em;
   margin: 0;
+  box-sizing: border-box;
 }
 .data {
   height: 100%;
@@ -591,10 +593,12 @@ h2 {
   padding: 0;
   margin: 0;
   width: 100%;
+  box-sizing: border-box;
 }
 pre {
   margin: 0;
-  padding: 0;
+  padding: 1em;
+  box-sizing: border-box;
 }
 code {
   overflow-x: visible !important;
