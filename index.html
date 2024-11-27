@@ -318,6 +318,8 @@ function confirmInput() {
   const markdown = document.getElementById("mdi").textContent;
   if (markdown === lastInput) return;
   
+  localStorage['mdi'] = document.getElementById('mdi').innerHTML;
+  
   lastInput = markdown;
   const element = document.getElementById("nso");
   const render = md.render(markdown).replace(/<(\/*?)ins>/g, '<$1u>');
@@ -376,10 +378,15 @@ function darkToggle(mode=document.documentElement.style.colorScheme) {
   };
 };
 
+
+
+
 window.onload = function() {
   const debouncedConfirm = debounce(confirmInput, 150);
   const mdi = document.getElementById("mdi");
   mdi.addEventListener('input', debouncedConfirm);
+  
+  mdi.innerHTML = localStorage['mdi'] || mdi.innerHTML;
   
   // Initial render
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
