@@ -368,18 +368,17 @@ function darkToggle(mode=document.documentElement.style.colorScheme) {
       style.href = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/vs2015.min.css";
       document.getElementById("sun").hidden = true;
       document.getElementById("moon").hidden = false;
+      localStorage['darkMode'] = "light";
       break;
     case "dark":
       elem.style.setProperty("color-scheme", "light");
       style.href = "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/vs.min.css";
       document.getElementById("moon").hidden = true;
       document.getElementById("sun").hidden = false;
+      localStorage['darkMode'] = "dark";
       break;
   };
 };
-
-
-
 
 window.onload = function() {
   const debouncedConfirm = debounce(confirmInput, 150);
@@ -389,11 +388,15 @@ window.onload = function() {
   mdi.innerHTML = localStorage['mdi'] || mdi.innerHTML;
   
   // Initial render
+  let mode = ''
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    darkToggle("light");
+    mode = "light";
   } else {
-    darkToggle("dark");
+    mode = "dark";
   }
+  mode = localStorage['darkMode'] || mode;
+  darkToggle(mode);
+  
   confirmInput();
 };
 </script>
