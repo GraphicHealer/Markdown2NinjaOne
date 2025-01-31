@@ -23,10 +23,8 @@ Here are the resources I used to build this HTML page:
   - THIS is what is doing ALL the grunt work. READ THE DOCS. That is how you adapt normal Markdown to Ninja's ANNOYING HTML Layout.
 
 ## Markdown Support Progress
-This converter works with pretty much everything markdown related that NinjaOne's editor supports, with a couple of minor exceptions.
-
+This converter works with pretty much everything markdown related that NinjaOne's editor supports, with the following exceptions:
 - **Images, because of a limitation of the Editor Itself**
-- **Code Blocks are currently broken in NinjaOne's Editor! They do not render correctly no matter how you use them!**
 
 # Contributing
 If you are a NinjaOne user, and you know some JavaScript, You are welcome to help out!
