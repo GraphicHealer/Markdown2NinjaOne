@@ -2,7 +2,7 @@
 Convert Markdown Content to NinjaOne's Source Format for Documentation.
 
 ## How to Use
-View it Here: https://graphichealer.github.io/Markdown2NinjaOne/
+View it Here: https://graphichealer.com/Markdown2NinjaOne/
 1. Paste or Write Markdown in the Left Textbox
 2. Click the Copy button on the upper-right of the Right Textbox.
 3. Open NinjaOne and go to the `Knowledge Base`.
