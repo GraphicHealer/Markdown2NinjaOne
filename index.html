@@ -18,7 +18,7 @@
 // Initalize Markdown-It
 const md = markdownit({
   xhtmlOut:true,
-  breaks:true,
+  breaks:false,
   html:true
 }).disable(['smartquotes']).use(markdownitIns).use(markdownitSub).use(markdownitSup).use(markdownitMark);
 
